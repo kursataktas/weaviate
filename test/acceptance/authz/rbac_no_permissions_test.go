@@ -60,6 +60,7 @@ func TestAuthzAllEndpointsNoPermissionDynamically(t *testing.T) {
 	col := NewCollector()
 	col.CollectEndpoints()
 	endpoints := col.AllEndpoints()
+	foundPaths := []string{}
 	// TODO: verify
 	expectedEndPoint := []string{
 		// needs to handle with AuthZ missing
@@ -101,6 +102,8 @@ func TestAuthzAllEndpointsNoPermissionDynamically(t *testing.T) {
 	}
 	for _, endpoint := range endpoints {
 		url := fmt.Sprintf("http://%s/v1%s", compose.GetWeaviate().URI(), endpoint.Path)
+		url = strings.ReplaceAll(url, "{className}/{id}", fmt.Sprintf("%s/%s", className, UUID1.String()))
+		url = strings.ReplaceAll(url, "/objects/{id}", fmt.Sprintf("/objects/%s", UUID1.String()))
 		url = strings.ReplaceAll(url, "{className}", className)
 		url = strings.ReplaceAll(url, "{tenantName}", "Tenant1")
 		url = strings.ReplaceAll(url, "{shardName}", "Shard1")
@@ -134,7 +137,7 @@ func TestAuthzAllEndpointsNoPermissionDynamically(t *testing.T) {
 			defer resp.Body.Close()
 
 			if http.StatusForbidden != resp.StatusCode {
-				expectedEndPoint = append(expectedEndPoint, endpoint.Path)
+				foundPaths = append(foundPaths, endpoint.Path)
 			}
 
 			if slices.Contains(expectedEndPoint, endpoint.Path) {
@@ -142,5 +145,9 @@ func TestAuthzAllEndpointsNoPermissionDynamically(t *testing.T) {
 			}
 			require.Equal(t, http.StatusForbidden, resp.StatusCode)
 		})
+	}
+
+	for _, path := range foundPaths {
+		t.Log(path)
 	}
 }
