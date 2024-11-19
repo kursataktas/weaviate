@@ -51,7 +51,7 @@ func TestAuthzAllEndpointsAdminDynamically(t *testing.T) {
 
 	for _, endpoint := range endpoints {
 		url := fmt.Sprintf("http://%s/v1%s", compose.GetWeaviate().URI(), endpoint.Path)
-		url = strings.ReplaceAll(url, "{className}/{id}", fmt.Sprintf("%s/%s", className, UUID1.String()))
+		url = strings.ReplaceAll(url, "/objects/{className}/{id}", fmt.Sprintf("/objects/%s/%s", className, UUID1.String()))
 		url = strings.ReplaceAll(url, "/objects/{id}", fmt.Sprintf("/objects/%s", UUID1.String()))
 		url = strings.ReplaceAll(url, "{className}", className)
 		url = strings.ReplaceAll(url, "{tenantName}", "Tenant1")

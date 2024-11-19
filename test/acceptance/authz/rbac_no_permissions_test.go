@@ -68,32 +68,19 @@ func TestAuthzAllEndpointsNoPermissionDynamically(t *testing.T) {
 		"/.well-known/live",
 		"/.well-known/openid-configuration",
 		"/.well-known/ready",
-
-		// needs to handle with BadRequests
 		"/authz/roles",
 		"/authz/roles/add-permissions",
 		"/authz/roles/remove-permissions",
 
-		// needs checking
+		// verify
 		"/batch/objects",
 		"/batch/objects",
 		"/batch/references",
 		"/graphql/batch",
 		"/meta",
-		"/objects/{className}/{id}",
-		"/objects/{className}/{id}",
-		"/objects/{className}/{id}",
-		"/objects/{className}/{id}",
-		"/objects/{className}/{id}",
-		"/objects/{className}/{id}/references/{propertyName}",
 		"/objects/{className}/{id}/references/{propertyName}",
 		"/objects/{className}/{id}/references/{propertyName}",
 		"/objects/{id}",
-		"/objects/{id}",
-		"/objects/{id}",
-		"/objects/{id}",
-		"/objects/{id}",
-		"/objects/{id}/references/{propertyName}",
 		"/objects/{id}/references/{propertyName}",
 		"/objects/{id}/references/{propertyName}",
 		"/schema/{className}/tenants",
@@ -102,7 +89,7 @@ func TestAuthzAllEndpointsNoPermissionDynamically(t *testing.T) {
 	}
 	for _, endpoint := range endpoints {
 		url := fmt.Sprintf("http://%s/v1%s", compose.GetWeaviate().URI(), endpoint.Path)
-		url = strings.ReplaceAll(url, "{className}/{id}", fmt.Sprintf("%s/%s", className, UUID1.String()))
+		url = strings.ReplaceAll(url, "/objects/{className}/{id}", fmt.Sprintf("/objects/%s/%s", className, UUID1.String()))
 		url = strings.ReplaceAll(url, "/objects/{id}", fmt.Sprintf("/objects/%s", UUID1.String()))
 		url = strings.ReplaceAll(url, "{className}", className)
 		url = strings.ReplaceAll(url, "{tenantName}", "Tenant1")
