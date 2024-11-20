@@ -6,7 +6,7 @@ from _pytest.fixtures import SubRequest
 from .conftest import _sanitize_role_name
 
 
-def test_rbac_refs(request: SubRequest):
+def test_rbac_refs(request: SubRequest, cleanup_role):
     with weaviate.connect_to_local(
         port=8081, grpc_port=50052, auth_credentials=wvc.init.Auth.api_key("admin-key")
     ) as client:
@@ -21,8 +21,7 @@ def test_rbac_refs(request: SubRequest):
         uuid_target1 = target.data.insert({})
         uuid_target2 = target.data.insert({})
         uuid_source = source.data.insert(properties={}, references={"ref": uuid_target1})
-        role_name = _sanitize_role_name(request.node.name)
-        client.roles.delete(role_name)
+        role_name = cleanup_role  # This role will be cleaned up even if test fails
 
         # read+update for both
         with weaviate.connect_to_local(
@@ -117,7 +116,7 @@ def test_rbac_refs(request: SubRequest):
         client.collections.delete([target.name, source.name])
 
 
-def test_batch_delete_with_filter(request: SubRequest) -> None:
+def test_batch_delete_with_filter(request: SubRequest, cleanup_role) -> None:
     col_name = _sanitize_role_name(request.node.name)
 
     with weaviate.connect_to_local(
@@ -135,8 +134,7 @@ def test_batch_delete_with_filter(request: SubRequest) -> None:
         )
         uuid_target1 = target.data.insert({})
 
-        role_name = _sanitize_role_name(request.node.name)
-        client.roles.delete(role_name)
+        role_name = cleanup_role  # This role will be cleaned up even if test fails
 
         # read+delete for both
         with weaviate.connect_to_local(
@@ -236,7 +234,7 @@ def test_batch_delete_with_filter(request: SubRequest) -> None:
         client.collections.delete([target.name, source.name])
 
 
-def test_search_with_filter_and_return(request: SubRequest) -> None:
+def test_search_with_filter_and_return(request: SubRequest, cleanup_role) -> None:
     col_name = _sanitize_role_name(request.node.name)
 
     with weaviate.connect_to_local(
@@ -255,8 +253,7 @@ def test_search_with_filter_and_return(request: SubRequest) -> None:
         uuid_target1 = target.data.insert({"prop": "word"})
         source.data.insert(properties={}, references={"ref": uuid_target1})
 
-        role_name = _sanitize_role_name(request.node.name)
-        client.roles.delete(role_name)
+        role_name = cleanup_role  # This role will be cleaned up even if test fails
 
         # read for both
         with weaviate.connect_to_local(
