@@ -27,11 +27,11 @@ import (
 	"github.com/weaviate/weaviate/test/helper"
 )
 
-func TestCollectEndpoints(t *testing.T) {
-	col := NewCollector()
-	col.CollectEndpoints()
-	col.PrettyPrint(col.ReadEndpoints())
-}
+// func TestCollectEndpoints(t *testing.T) {
+// 	col := NewCollector()
+// 	col.CollectEndpoints()
+// 	col.PrettyPrint(col.ReadEndpoints())
+// }
 
 func TestAuthzAllEndpointsNoPermissionDynamically(t *testing.T) {
 	adminKey := "admin-Key"
@@ -60,7 +60,7 @@ func TestAuthzAllEndpointsNoPermissionDynamically(t *testing.T) {
 	col := NewCollector()
 	col.CollectEndpoints()
 	endpoints := col.AllEndpoints()
-	foundPaths := []string{}
+	foundPaths := []Endpoint{}
 	// TODO: verify
 	expectedEndPoint := []string{
 		// needs to handle with AuthZ missing
@@ -68,24 +68,24 @@ func TestAuthzAllEndpointsNoPermissionDynamically(t *testing.T) {
 		"/.well-known/live",
 		"/.well-known/openid-configuration",
 		"/.well-known/ready",
-		"/authz/roles",
-		"/authz/roles/add-permissions",
-		"/authz/roles/remove-permissions",
 
-		// verify
-		"/batch/objects",
-		"/batch/objects",
-		"/batch/references",
-		"/graphql/batch",
-		"/meta",
-		"/objects/{className}/{id}/references/{propertyName}",
-		"/objects/{className}/{id}/references/{propertyName}",
-		"/objects/{id}",
-		"/objects/{id}/references/{propertyName}",
-		"/objects/{id}/references/{propertyName}",
-		"/schema/{className}/tenants",
-		"/schema/{className}/tenants",
-		"/schema/{className}/tenants",
+		// /authz/roles POST
+		// /authz/roles/add-permissions POST
+		// /authz/roles/remove-permissions POST
+
+		// /batch/objects DELETE
+		// /batch/objects POST
+		// /batch/references POST
+		// /graphql/batch POST
+		// /meta GET
+		// /objects/{className}/{id}/references/{propertyName} DELETE
+		// /objects/{className}/{id}/references/{propertyName} PUT
+		// /objects/{id} PATCH
+		// /objects/{id}/references/{propertyName} DELETE
+		// /objects/{id}/references/{propertyName} PUT
+		// /schema/{className}/tenants DELETE
+		// /schema/{className}/tenants POST
+		// /schema/{className}/tenants PUT
 	}
 	for _, endpoint := range endpoints {
 		url := fmt.Sprintf("http://%s/v1%s", compose.GetWeaviate().URI(), endpoint.Path)
@@ -124,7 +124,7 @@ func TestAuthzAllEndpointsNoPermissionDynamically(t *testing.T) {
 			defer resp.Body.Close()
 
 			if http.StatusForbidden != resp.StatusCode {
-				foundPaths = append(foundPaths, endpoint.Path)
+				foundPaths = append(foundPaths, endpoint)
 			}
 
 			if slices.Contains(expectedEndPoint, endpoint.Path) {
@@ -135,6 +135,6 @@ func TestAuthzAllEndpointsNoPermissionDynamically(t *testing.T) {
 	}
 
 	for _, path := range foundPaths {
-		t.Log(path)
+		t.Log(fmt.Printf("%s %s", path.Path, path.Method))
 	}
 }
