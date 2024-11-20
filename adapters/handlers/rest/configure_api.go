@@ -861,6 +861,7 @@ func registerModules(appState *state.State) error {
 		modtext2vecoctoai.Name,
 		modopenai.Name,
 		modvoyageai.Name,
+		modweaviateembed.Name,
 	}
 	defaultGenerative := []string{
 		modgenerativeanthropic.Name,
